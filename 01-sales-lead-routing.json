@@ -1,0 +1,495 @@
+{
+  "name": "Sales Lead Routing",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        96
+      ],
+      "id": "167030d1-c4b2-4d80-85f4-862235920866",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n{json:{lead_id:\"L-101\",company:\"TechStart Inc\",budget:5000,region:\"US\"}},\n{json:{lead_id:\"L-102\",company:\"Bakery Local\",budget:800,region:\"US\"}},\n{json:{lead_id:\"L-103\",company:\"Berlin Logistics\",budget:3000,region:\"EU\"}},\n{json:{lead_id:\"L-104\",company:\"Tokyo Traders\",budget:10000,region:\"ASIA\"}}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        192
+      ],
+      "id": "92a4c0a6-20bb-4d71-a8fb-f14821e3edb6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "https://dummyjson.com/products",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "4"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        192,
+        -208
+      ],
+      "id": "f0b5bad2-6d78-46c0-942e-739a47791d7a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "products",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        -208
+      ],
+      "id": "5e67f8df-88ff-475f-8230-fe9f7754d14f",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        880,
+        -32
+      ],
+      "id": "273a902f-1fc4-4734-af8d-1a14034adf2d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f260ce6a-a872-444b-9f3b-940f7820820b",
+              "leftValue": "={{ $('Code in JavaScript').item.json.budget }}",
+              "rightValue": 1500,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1104,
+        -32
+      ],
+      "id": "830218b9-8b41-43ff-8b57-e4b075a9571a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3bc12db1-e30f-4e63-933c-aab3649821a4",
+                    "leftValue": "={{ $('Code in JavaScript').item.json.region }}",
+                    "rightValue": "US",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2ee383f6-a62d-4341-96be-da5f52f7f299",
+                    "leftValue": "={{ $('Code in JavaScript').item.json.region }}",
+                    "rightValue": "EU",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9dec0237-9e9e-4ae2-b293-a06c9f16e67a",
+                    "leftValue": "={{ $('Code in JavaScript').item.json.region }}",
+                    "rightValue": "ASIA",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        -416
+      ],
+      "id": "2577387f-aab6-42ae-bda9-018c2332eb61",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "39aedc34-03e2-463c-a086-f784349a0946",
+              "name": "lead_id",
+              "value": "={{ $json.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "34315c73-88f3-44f1-9d9c-5d8a743c7249",
+              "name": "company",
+              "value": "={{ $json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "42cbd5b9-71a9-48e7-9c9b-9abf5ae4049e",
+              "name": "budget",
+              "value": "={{ $json.budget }}",
+              "type": "number"
+            },
+            {
+              "id": "eead6adb-e482-4edf-8bbb-28395eac2206",
+              "name": "region",
+              "value": "={{ $json.region }}",
+              "type": "string"
+            },
+            {
+              "id": "d6751e47-df1e-4654-8ad5-0de16e145427",
+              "name": "US PATH",
+              "value": "assigned to us team path",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1824,
+        -624
+      ],
+      "id": "9a9b27da-3996-4424-9919-00b93533a374",
+      "name": "US"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1f914de0-10e8-4a7b-b8cd-4d2e0c254d92",
+              "name": "lead_id",
+              "value": "={{ $json.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "a746fcc6-0aa0-4a23-a9c3-785d04af76dd",
+              "name": "company",
+              "value": "={{ $json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "fe99e812-5e5a-4f91-bcad-cabb3b9399b2",
+              "name": "budget",
+              "value": "={{ $json.budget }}",
+              "type": "number"
+            },
+            {
+              "id": "74480b3c-405b-4adb-b66b-ce97d804d92e",
+              "name": "region",
+              "value": "={{ $json.region }}",
+              "type": "string"
+            },
+            {
+              "id": "1818aa4a-267a-40d5-a4dd-39a9ebef9130",
+              "name": "EU PATH",
+              "value": "assigned to eu team path",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1808,
+        -400
+      ],
+      "id": "44543c7f-3160-408a-ab7f-bbbc006f1a48",
+      "name": "EU"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2ec7d262-48d5-4a20-8121-3a0ac73773ea",
+              "name": "lead_id",
+              "value": "={{ $json.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "c645e06b-e96c-4001-9067-2e802c58aa7a",
+              "name": "company",
+              "value": "={{ $json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "fb4e8b98-4f46-44a8-9e7e-10591e268246",
+              "name": "budget",
+              "value": "={{ $json.budget }}",
+              "type": "number"
+            },
+            {
+              "id": "f352e132-b74a-41f8-a292-f94a52e99594",
+              "name": "region",
+              "value": "={{ $json.region }}",
+              "type": "string"
+            },
+            {
+              "id": "bb1f6137-759e-4e5c-be63-21cb7fbd5880",
+              "name": "ASIA PATH",
+              "value": "assigned to asia team path",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1920,
+        -144
+      ],
+      "id": "ec005441-e9be-4aa0-a6a9-2ade6d5a3c34",
+      "name": "ASIA"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2cd6a191-aca1-4d87-88d3-33dabce59ffe",
+              "name": "lead_id",
+              "value": "={{ $('Code in JavaScript').item.json.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "874c9be1-e692-4a5e-8169-52454be39602",
+              "name": "company",
+              "value": "={{ $('Code in JavaScript').item.json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "a588157e-81c7-44d8-abb4-53e83a0adba5",
+              "name": "region",
+              "value": "={{ $('Code in JavaScript').item.json.region }}",
+              "type": "string"
+            },
+            {
+              "id": "3106f38d-efe5-4edd-be54-09566a5907a3",
+              "name": "budget",
+              "value": "={{ $('Code in JavaScript').item.json.budget }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1840,
+        400
+      ],
+      "id": "a5fd171f-2513-425e-943b-12e2a0097436",
+      "name": "low budget"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "low budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "US",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "EU",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ASIA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

@@ -1,0 +1,132 @@
+{
+  "name": "Daily Tech News Digest",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1,
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f4fda078-f54f-4f5d-8579-bacd76130577",
+      "name": "Every Day 8:00"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "id": "ed426e0e-e90b-4c11-8707-dfdbec324d31",
+      "name": "Manual Test"
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.bbci.co.uk/news/technology/rss.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        260,
+        100
+      ],
+      "id": "c353ea99-601b-497d-90bb-b03cb4d78f33",
+      "name": "Read Tech RSS"
+    },
+    {
+      "parameters": {
+        "maxItems": 5
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        500,
+        100
+      ],
+      "id": "3772502f-b06d-49af-b8d0-72035fb506ae",
+      "name": "Keep Top 5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const lines = $input.all().map((item, i) => `${i + 1}. ${item.json.title}\\n   ${item.json.link}`);\nreturn [{ json: { subject: 'Tech news digest - ' + new Date().toISOString().slice(0, 10), count: lines.length, body: lines.join('\\n\\n') } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        100
+      ],
+      "id": "d26e4602-0fc9-4f09-b7a4-f1bdfaa7f651",
+      "name": "Build Digest"
+    }
+  ],
+  "connections": {
+    "Every Day 8:00": {
+      "main": [
+        [
+          {
+            "node": "Read Tech RSS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Test": {
+      "main": [
+        [
+          {
+            "node": "Read Tech RSS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Tech RSS": {
+      "main": [
+        [
+          {
+            "node": "Keep Top 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep Top 5": {
+      "main": [
+        [
+          {
+            "node": "Build Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

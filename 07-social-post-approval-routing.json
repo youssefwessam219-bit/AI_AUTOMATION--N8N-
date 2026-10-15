@@ -1,0 +1,285 @@
+{
+  "name": "Social Post Approval Routing",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -128
+      ],
+      "id": "bc1b7bf1-865f-4ac1-9328-0da36a771e9e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n{json:{id:\"P-101\",platform:\"LinkedIn\",content:\"Excited to announce our Series B funding!\",status:\"Approved\"}},\n{json:{id:\"P-102\",platform:\"Instagram\",content:\"Team lunch at the new pizza place!\",status:\"Draft\"}},\n{json:{id:\"P-103\",platform:\"LinkedIn\",content:\"5 Tips for Better Productivity.\",status:\"Draft\"}},\n{json:{id:\"P-104\",platform:\"Instagram\",content:\"Sunset from our office rooftop.\",status:\"Approved\"}}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        -128
+      ],
+      "id": "c13c0d28-9516-4543-9b32-e1ae548c7679",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2f26e059-af4b-4e1f-a593-8d4c8ffc99ce",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "Approved",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        640,
+        -128
+      ],
+      "id": "d364ddab-0166-4007-ad2a-9533423fd89b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c70c3198-8e0b-414b-b4c8-5a770bf2005e",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "fb361bc1-858c-4cc7-abaa-40738ce2e6dd",
+              "name": "platform",
+              "value": "={{ $json.platform }}",
+              "type": "string"
+            },
+            {
+              "id": "b436cbc9-77a0-4ea0-879d-a045bba77c79",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "e3070684-16c8-4a73-956c-d70592e69f40",
+              "name": "status",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "e6f29dcc-9f85-4abb-be51-e503ad031940",
+              "name": "note",
+              "value": "needs revision",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        848,
+        144
+      ],
+      "id": "26c0f240-07ea-4fd8-be7e-dc135857919b",
+      "name": "need reveision"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "14e01eea-554a-4f2a-8fe9-56165eb42b71",
+                    "leftValue": "={{ $json.platform }}",
+                    "rightValue": "LinkedIn",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0de6170f-75c7-4e3a-88b6-f138e6db1611",
+                    "leftValue": "={{ $json.platform }}",
+                    "rightValue": "Instagram",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        864,
+        -208
+      ],
+      "id": "cf01ffc6-a903-43eb-a686-4aed734277ec",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cbc8adad-f4d5-4e4e-81f5-8f9ff459a98c",
+              "name": "final_text",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1344,
+        -208
+      ],
+      "id": "803ea4ff-9bc7-4919-ad3d-0f15f9f52fc9",
+      "name": "linked in publish"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "618d209d-7f28-43e5-9d19-bcb46af231f5",
+              "name": "final_text",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1312,
+        16
+      ],
+      "id": "01770ede-186d-4dcb-a605-b1ff9642bd3a",
+      "name": "instagram publish"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "need reveision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "linked in publish",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "instagram publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

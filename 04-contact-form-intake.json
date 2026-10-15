@@ -1,0 +1,190 @@
+{
+  "name": "Contact Form Intake and Validation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "contact-intake-demo",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        300
+      ],
+      "id": "ac2f7d32-c328-4e74-98b5-fa9822008e8e",
+      "name": "Contact Form Webhook",
+      "webhookId": "1a31f063-c77f-4c73-ae3c-b42a866c85df"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dbc8a934-5cf6-44c6-afe6-157856d95d51",
+              "name": "name",
+              "value": "={{ ($json.body.name || \"\").trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "7759766d-5c3e-4dbd-b74a-47178ec41dc3",
+              "name": "email",
+              "value": "={{ ($json.body.email || \"\").trim().toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "077ce941-46e2-4d63-9a83-dc670ff8c440",
+              "name": "message",
+              "value": "={{ ($json.body.message || \"\").trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "651a8275-8624-4db2-9f41-31d8995cd3dd",
+              "name": "receivedAt",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        480,
+        300
+      ],
+      "id": "e3bfe04b-bcf4-4f23-b7fd-b92b77cd4b17",
+      "name": "Normalize Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "49f2e746-146f-436a-a08d-068805de71a5",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            },
+            {
+              "id": "745980e0-73ec-46d3-85db-8a74581a615e",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        720,
+        300
+      ],
+      "id": "1e576d1d-da44-4a04-9c35-fd07cb74cce1",
+      "name": "Valid Email and Message?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { status: \"received\", name: $json.name, receivedAt: $json.receivedAt } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        960,
+        200
+      ],
+      "id": "3f687d22-72ff-4c5f-8f53-b50fb4575282",
+      "name": "Respond Success"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\":\"error\",\"reason\":\"A valid email and a message are required\"}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        960,
+        400
+      ],
+      "id": "a5919d46-87fa-4b9e-8519-da7441da5a72",
+      "name": "Respond Error"
+    }
+  ],
+  "connections": {
+    "Contact Form Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Fields": {
+      "main": [
+        [
+          {
+            "node": "Valid Email and Message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid Email and Message?": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

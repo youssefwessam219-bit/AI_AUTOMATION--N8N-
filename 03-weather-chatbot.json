@@ -1,0 +1,198 @@
+{
+  "name": "Weather Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "209f98b5-6e50-4426-ab8c-2783214f30d2",
+      "name": "When chat message received"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af0d8610-01eb-4183-ae30-4bb97100c8fb",
+              "name": "topic",
+              "value": "weather",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        192,
+        0
+      ],
+      "id": "6eb144ab-abc7-4e57-b5ce-9c58a39eade9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4fb193d2-708b-4b49-a304-4e3839e748ef",
+              "leftValue": "={{ $('When chat message received').item.json.chatInput }}",
+              "rightValue": "weather",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        432,
+        -16
+      ],
+      "id": "ef91cae4-5c4e-407f-8349-e03a53a38eb3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "https://api.open-meteo.com/v1/forecast",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "latitude",
+              "value": "30.0444"
+            },
+            {
+              "name": "longitude",
+              "value": "31.2357"
+            },
+            {
+              "name": "current_weather",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        656,
+        -160
+      ],
+      "id": "661dc80f-8efa-497e-9893-33f4ad933ece",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "message": "the current temp is 21 celisus",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        976,
+        -128
+      ],
+      "id": "643a37d4-2fe2-4549-ae11-80fec4b77e1f",
+      "name": "Chat"
+    },
+    {
+      "parameters": {
+        "message": "i can help you only with weather , i am sorry",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        672,
+        288
+      ],
+      "id": "8fab80c9-9f40-4210-bb92-cb63cf319486",
+      "name": "Chat1"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Chat1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}
