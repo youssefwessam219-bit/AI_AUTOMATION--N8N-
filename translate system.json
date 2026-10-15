@@ -1,0 +1,222 @@
+{
+  "name": "real_work_lab",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "03b03c10-69b3-434c-a805-9fdb54de3af4",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "47c9f6e9-b435-4ff0-9568-f7eb5bde5b67",
+              "name": "imageUrl",
+              "value": "https://dl.a9t9.com/blog/ocr-online/screenshot.jpg",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "19211b6d-5ad8-4a41-8ccb-14908ecf652e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "https://api.ocr.space/parse/imageurl",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "01aade089188957"
+            },
+            {
+              "name": "Url",
+              "value": "={{ $json.imageUrl }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "323591eb-d229-4bfc-ae1e-d240a1b7bc4b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5898300c-b6d5-4571-8709-d3d91aea9969",
+              "name": "originalText",
+              "value": "={{ $json.ParsedResults[0].ParsedText }}",
+              "type": "string"
+            },
+            {
+              "id": "d42599b4-80a5-4612-9109-0cceb685cd58",
+              "name": "imageUrl",
+              "value": "={{ $('Edit Fields').item.json.imageUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        688,
+        0
+      ],
+      "id": "2b6b1106-a64f-4342-92eb-7699ead04860",
+      "name": "prepare text"
+    },
+    {
+      "parameters": {
+        "url": "https://api.mymemory.translated.net/get",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.originalText }}"
+            },
+            {
+              "name": "langpair",
+              "value": "en|es"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        912,
+        16
+      ],
+      "id": "111cc4a0-4e05-4bf6-8c4b-0bb007f81f5b",
+      "name": "translation"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d3dec0f9-95ae-4dfc-a210-0cd060227769",
+              "name": "originalText",
+              "value": "={{ $('prepare text').item.json.originalText }}",
+              "type": "string"
+            },
+            {
+              "id": "7a03a563-62ce-4848-9222-e26e6dbbcc38",
+              "name": "translatedText",
+              "value": "={{ $json.responseData.translatedText }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1136,
+        32
+      ],
+      "id": "48409a4d-75c0-4ebf-8fcc-fbbb9c4d09d6",
+      "name": "final result"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "prepare text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepare text": {
+      "main": [
+        [
+          {
+            "node": "translation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "translation": {
+      "main": [
+        [
+          {
+            "node": "final result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "8449de67-e79e-4d83-aeb5-a46284a8252d",
+  "meta": {
+    "instanceId": "5f82c185b867c88dc45c0ac83634c233e184ad4c2393d7cb67ed483817723061"
+  },
+  "nodeGroups": [],
+  "id": "wl1dLESiCoOUqu3E",
+  "tags": []
+}
